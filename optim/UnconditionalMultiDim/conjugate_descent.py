@@ -2,13 +2,14 @@ from typing import Callable
 
 import numpy as np
 
+from optim.utils.deriv import gradient
 from optim.UnconditionalOneDim import newton
 
 
 def find_min(func: Callable[[np.ndarray], float], init_point: np.ndarray,
              ndim: int = 1, eps: float = 1e-3, eps_func: float = 1e-5, max_iter: int = 100,
              verbose: bool = False, return_argmin: bool = True) -> np.ndarray:
-    """Finds the minimum value of a function using Powell's method.
+    """Finds the minimum value of a function within a given interval using Conjugate Gradient descent method.
 
     Parameters:
     func (Callable[[np.ndarray], float]): The function to minimize.
@@ -30,38 +31,42 @@ def find_min(func: Callable[[np.ndarray], float], init_point: np.ndarray,
     previous_point = point + np.random.rand(ndim) * 10
     previous_point_func = func(previous_point)
     point_func = func(point)
+    grad = gradient(func, point, ndim, eps)
+    previous_grad = 0
+    step = 0
     iteration = 0
 
     while (np.linalg.norm(previous_point - point) > eps and
            np.linalg.norm(previous_point_func - point_func) > eps_func and
+           np.linalg.norm(grad) > eps_func and
            iteration < max_iter):
         if verbose:
             print(
                 f"Iteration: {iteration}, previous point: {previous_point}, current point: {point}, F(current point): {func(point)}")
-
         previous_point = point.copy()
-        directions = np.eye(ndim)
 
-        for direction in directions:
-            one_dim_func = lambda a: func(point + a * direction)
-            if verbose:
-                print(f"Starting dimension {direction} optimization")
-            alpha = newton.find_min(one_dim_func, 0.0, verbose=verbose, return_argmin=True)
-            point = point + alpha * direction
+        grad = gradient(func, point, ndim, eps)
 
-        new_direction = point - previous_point
-        if np.linalg.norm(new_direction) < eps:
-            break
-
-        one_dim_func = lambda a: func(point + a * direction)
         if verbose:
-            print("Starting one dim optimization")
-        alpha = newton.find_min(one_dim_func, 0.0, verbose=verbose, return_argmin=True)
-        point = point + alpha * new_direction
+            print(
+                f"Gradient in current point: {np.linalg.norm(grad)}")
+
+        grad /= np.linalg.norm(grad)
+
+        if iteration != 0:
+            grad = grad + np.power(np.linalg.norm(grad) / np.linalg.norm(previous_grad), 2) * step
+
+        step = grad
+
+        optim_func = lambda a: func(point - a * step)
+        alpha = newton.find_min(optim_func, 0, eps=eps, max_iter=max_iter, verbose=verbose, return_argmin=True)
+
+        point -= alpha * step
 
         iteration += 1
         previous_point_func = point_func
         point_func = func(point)
+        previous_grad = grad
 
     return point if return_argmin else np.array([func(point)])
 
@@ -69,7 +74,7 @@ def find_min(func: Callable[[np.ndarray], float], init_point: np.ndarray,
 def find_max(func: Callable[[np.ndarray], float], init_point: np.ndarray,
              ndim: int = 1, eps: float = 1e-3, eps_func: float = 1e-5, max_iter: int = 1e2,
              verbose: bool = False, return_argmin: bool = True) -> np.ndarray:
-    """Finds the maximum value of a function within a given interval using the Powell's method.
+    """Finds the maximum value of a function within a given interval using the Conjugate Gradient descent method.
 
     Parameters:
     func (Callable[[np.ndarray], float]): The function to minimize.

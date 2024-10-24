@@ -1,17 +1,19 @@
 from typing import Callable
+
 import numpy as np
+
 from optim.UnconditionalOneDim import newton
 
 
 def ortogonalization(vectors: np.ndarray) -> np.ndarray:
     """Orthogonalizes a set of n-dimensional vectors using the Gram-Schmidt process.
 
-        Args:
-            vectors (np.ndarray): A 2D array where each row represents a vector to be orthogonalized.
+    Args:
+        vectors (np.ndarray): A 2D array where each row represents a vector to be orthogonalized.
 
-        Returns:
-            np.ndarray: A 2D array where each row is an orthogonalized vector.
-        """
+    Returns:
+        np.ndarray: A 2D array where each row is an orthogonalized vector.
+    """
     if vectors.ndim != 2:
         raise ValueError("Input must be a 2D array.")
     if vectors.shape[0] < 1:
@@ -35,8 +37,7 @@ def ortogonalization(vectors: np.ndarray) -> np.ndarray:
 def find_min(func: Callable[[np.ndarray], float], init_point: np.ndarray,
              ndim: int = 1, eps: float = 1e-3, eps_func: float = 1e-5, max_iter: int = 100,
              verbose: bool = False, return_argmin: bool = True) -> np.ndarray:
-    """
-    Finds the minimum value of a function within a given interval using the Gauss-Seidel method.
+    """Finds the minimum value of a function within a given interval using the Rosenbrock method.
 
     Parameters:
     func (Callable[[np.ndarray], float]): The function to minimize.
@@ -93,8 +94,7 @@ def find_min(func: Callable[[np.ndarray], float], init_point: np.ndarray,
 def find_max(func: Callable[[np.ndarray], float], init_point: np.ndarray,
              ndim: int = 1, eps: float = 1e-3, eps_func: float = 1e-5, max_iter: int = 1e2,
              verbose: bool = False, return_argmin: bool = True) -> np.ndarray:
-    """
-    Finds the maximum value of a function within a given interval using the Gauss-Seidel method.
+    """Finds the maximum value of a function within a given interval using the Gauss-Seidel method.
 
     Parameters:
     func (Callable[[np.ndarray], float]): The function to minimize.

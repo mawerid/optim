@@ -1,26 +1,13 @@
 from typing import Callable
+
 import numpy as np
 
-
-def derivative(func: Callable[[float], float], x: float, eps: float = 1e-3) -> float:
-    """
-    Calculates the derivative of a function at a given point using the central difference method.
-
-    Parameters:
-    func (Callable[[float], float]): The function to differentiate.
-    x (float): The point at which to calculate the derivative.
-    eps (float): The precision of the calculation.
-
-    Returns:
-    float: The derivative of the function at the given point.
-    """
-    return (func(x + eps) - func(x - eps)) / (2 * eps)
+from optim.utils.deriv import derivative
 
 
 def find_min(func: Callable[[float], float], interval: np.ndarray,
              eps: float = 1e-3, verbose: bool = False, return_argmin: bool = False) -> float:
-    """
-    Finds the minimum value of a function within a given interval using the chord method.
+    """Finds the minimum value of a function within a given interval using the chord method.
 
     Parameters:
     func (Callable[[float], float]): The function to minimize.
@@ -61,8 +48,7 @@ def find_min(func: Callable[[float], float], interval: np.ndarray,
 
 def find_max(func: Callable[[float], float], interval: np.ndarray,
              eps: float = 1e-3, verbose: bool = False, return_argmin: bool = False) -> float:
-    """
-    Finds the maximum value of a function within a given interval using the chord method.
+    """Finds the maximum value of a function within a given interval using the chord method.
 
     Parameters:
     func (Callable[[float], float]): The function to maximize.
