@@ -1,3 +1,6 @@
+"""Gradient descent method for unconstrained optimization.
+"""
+
 from typing import Callable
 
 import numpy as np
@@ -6,25 +9,25 @@ from optim.utils.deriv import gradient
 
 
 def find_min(func: Callable[[np.ndarray], float], init_point: np.ndarray,
-             ndim: int = 1, eps: float = 1e-3, eps_func: float = 1e-5, max_iter: int = 100,
-             alpha: float = 1, step_split: float = 0.5, verbose: bool = False,
+             ndim: int = 1, eps: float = 1e-3, eps_func: float = 1e-5, max_iter: int = 1e5,
+             alpha: float = 1, step_split: float = 0.7, verbose: bool = False,
              return_argmin: bool = True) -> np.ndarray:
     """Finds the minimum value of a function within a given interval using Gradient descent method.
 
     Parameters:
-    func (Callable[[np.ndarray], float]): The function to minimize.
-    init_point (np.ndarray): The initial point to start optimization.
-    ndim (int): The number of dimensions of the function.
-    eps (float): The precision of the search.
-    eps_func (float): The precision of the function value.
-    max_iter (int): The maximum number of iterations to perform.
-    alpha (float): The initial step len coefficient.
-    step_split (float): The splitting step coefficient.
-    verbose (bool): If True, prints detailed information about each iteration.
-    return_argmin (bool): If True, returns the x value that minimizes the function. Otherwise, returns the minimum function value.
+        func (Callable[[np.ndarray], float]): The function to minimize.
+        init_point (np.ndarray): The initial point to start optimization.
+        ndim (int): The number of dimensions of the function.
+        eps (float): The precision of the search.
+        eps_func (float): The precision of the function value.
+        max_iter (int): The maximum number of iterations to perform.
+        alpha (float): The initial step len coefficient.
+        step_split (float): The splitting step coefficient.
+        verbose (bool): If True, prints detailed information about each iteration.
+        return_argmin (bool): If True, returns the x value that minimizes the function. Otherwise, returns the minimum function value.
 
     Returns:
-    np.ndarray: The minimum value of the function or the x value that minimizes the function.
+        np.ndarray: The minimum value of the function or the x value that minimizes the function.
     """
     if init_point.shape != (ndim,):
         raise ValueError("Initial point shape must be (ndim,).")
@@ -66,23 +69,26 @@ def find_min(func: Callable[[np.ndarray], float], init_point: np.ndarray,
 
 
 def find_max(func: Callable[[np.ndarray], float], init_point: np.ndarray,
-             ndim: int = 1, eps: float = 1e-3, eps_func: float = 1e-5, max_iter: int = 1e2,
+             ndim: int = 1, eps: float = 1e-3, eps_func: float = 1e-5, max_iter: int = 1e5,
              verbose: bool = False, return_argmin: bool = True) -> np.ndarray:
     """Finds the maximum value of a function within a given interval using the Gradient descent method.
 
     Parameters:
-    func (Callable[[np.ndarray], float]): The function to minimize.
-    init_point (np.ndarray): The initial point to start optimization.
-    ndim (int): The number of dimensions of the function.
-    eps (float): The precision of the search.
-    eps_func (float): The precision of the function value.
-    max_iter (int): The maximum number of iterations to perform.
-    verbose (bool): If True, prints detailed information about each iteration.
-    return_argmin (bool): If True, returns the x value that minimizes the function. Otherwise, returns the minimum function value.
+        func (Callable[[np.ndarray], float]): The function to minimize.
+        init_point (np.ndarray): The initial point to start optimization.
+        ndim (int): The number of dimensions of the function.
+        eps (float): The precision of the search.
+        eps_func (float): The precision of the function value.
+        max_iter (int): The maximum number of iterations to perform.
+        verbose (bool): If True, prints detailed information about each iteration.
+        return_argmin (bool): If True, returns the x value that minimizes the function. Otherwise, returns the minimum function value.
 
     Returns:
-    np.ndarray: The minimum value of the function or the x value that minimizes the function.
+        np.ndarray: The minimum value of the function or the x value that minimizes the function.
     """
-    rev_func = lambda x: -func(x)
+
+    def rev_func(x: np.ndarray) -> float:
+        return (-1) * func(x)
+
     return find_min(rev_func, init_point, ndim, eps, eps_func,
                     max_iter, verbose, return_argmin)

@@ -1,3 +1,6 @@
+"""Powell's method for unconstrained optimization.
+"""
+
 from typing import Callable
 
 import numpy as np
@@ -6,22 +9,22 @@ from optim.UnconditionalOneDim import newton
 
 
 def find_min(func: Callable[[np.ndarray], float], init_point: np.ndarray,
-             ndim: int = 1, eps: float = 1e-3, eps_func: float = 1e-5, max_iter: int = 100,
+             ndim: int = 1, eps: float = 1e-3, eps_func: float = 1e-5, max_iter: int = 1e5,
              verbose: bool = False, return_argmin: bool = True) -> np.ndarray:
     """Finds the minimum value of a function using Powell's method.
 
     Parameters:
-    func (Callable[[np.ndarray], float]): The function to minimize.
-    init_point (np.ndarray): The initial point to start optimization.
-    ndim (int): The number of dimensions of the function.
-    eps (float): The precision of the search.
-    eps_func (float): The precision of the function value.
-    max_iter (int): The maximum number of iterations to perform.
-    verbose (bool): If True, prints detailed information about each iteration.
-    return_argmin (bool): If True, returns the x value that minimizes the function. Otherwise, returns the minimum function value.
+        func (Callable[[np.ndarray], float]): The function to minimize.
+        init_point (np.ndarray): The initial point to start optimization.
+        ndim (int): The number of dimensions of the function.
+        eps (float): The precision of the search.
+        eps_func (float): The precision of the function value.
+        max_iter (int): The maximum number of iterations to perform.
+        verbose (bool): If True, prints detailed information about each iteration.
+        return_argmin (bool): If True, returns the x value that minimizes the function. Otherwise, returns the minimum function value.
 
     Returns:
-    np.ndarray: The minimum value of the function or the x value that minimizes the function.
+        np.ndarray: The minimum value of the function or the x value that minimizes the function.
     """
     if init_point.shape != (ndim,):
         raise ValueError("Initial point shape must be (ndim,).")
@@ -43,7 +46,10 @@ def find_min(func: Callable[[np.ndarray], float], init_point: np.ndarray,
         directions = np.eye(ndim)
 
         for direction in directions:
-            one_dim_func = lambda a: func(point + a * direction)
+
+            def one_dim_func(a: float) -> float:
+                return func(point + a * direction)
+
             if verbose:
                 print(f"Starting dimension {direction} optimization")
             alpha = newton.find_min(one_dim_func, 0.0, verbose=verbose, return_argmin=True)
@@ -53,7 +59,9 @@ def find_min(func: Callable[[np.ndarray], float], init_point: np.ndarray,
         if np.linalg.norm(new_direction) < eps:
             break
 
-        one_dim_func = lambda a: func(point + a * direction)
+        def one_dim_func(a: float) -> float:
+            return func(point + a * direction)
+
         if verbose:
             print("Starting one dim optimization")
         alpha = newton.find_min(one_dim_func, 0.0, verbose=verbose, return_argmin=True)
@@ -67,23 +75,26 @@ def find_min(func: Callable[[np.ndarray], float], init_point: np.ndarray,
 
 
 def find_max(func: Callable[[np.ndarray], float], init_point: np.ndarray,
-             ndim: int = 1, eps: float = 1e-3, eps_func: float = 1e-5, max_iter: int = 1e2,
+             ndim: int = 1, eps: float = 1e-3, eps_func: float = 1e-5, max_iter: int = 1e5,
              verbose: bool = False, return_argmin: bool = True) -> np.ndarray:
     """Finds the maximum value of a function within a given interval using the Powell's method.
 
     Parameters:
-    func (Callable[[np.ndarray], float]): The function to minimize.
-    init_point (np.ndarray): The initial point to start optimization.
-    ndim (int): The number of dimensions of the function.
-    eps (float): The precision of the search.
-    eps_func (float): The precision of the function value.
-    max_iter (int): The maximum number of iterations to perform.
-    verbose (bool): If True, prints detailed information about each iteration.
-    return_argmin (bool): If True, returns the x value that minimizes the function. Otherwise, returns the minimum function value.
+        func (Callable[[np.ndarray], float]): The function to minimize.
+        init_point (np.ndarray): The initial point to start optimization.
+        ndim (int): The number of dimensions of the function.
+        eps (float): The precision of the search.
+        eps_func (float): The precision of the function value.
+        max_iter (int): The maximum number of iterations to perform.
+        verbose (bool): If True, prints detailed information about each iteration.
+        return_argmin (bool): If True, returns the x value that minimizes the function. Otherwise, returns the minimum function value.
 
     Returns:
-    np.ndarray: The minimum value of the function or the x value that minimizes the function.
+        np.ndarray: The minimum value of the function or the x value that minimizes the function.
     """
-    rev_func = lambda x: -func(x)
+
+    def rev_func(x: np.ndarray) -> float:
+        return (-1) * func(x)
+
     return find_min(rev_func, init_point, ndim, eps, eps_func,
                     max_iter, verbose, return_argmin)
